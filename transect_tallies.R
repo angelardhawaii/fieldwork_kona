@@ -790,3 +790,4 @@ pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculat
                      calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
                      format="%.1f %%", caption="% Total")
 pt$renderPivot()
+

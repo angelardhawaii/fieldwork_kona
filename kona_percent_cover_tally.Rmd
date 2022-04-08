@@ -1,0 +1,930 @@
+---
+title: "Kona Percent Cover Tally"
+author: "Angela Richards Donà"
+date: "4/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This point-intercept data was collected at 10 sites along the coast of Kona, Hawai‘i. Up to 10 10-meter transects were surveyed per site, with 16 points within 1/2 meter quads. Substrate type, live cover type, and where applicable: Genus and species are counted and tallied.
+
+Packages loaded for all:
+
+```{r, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(pivottabler)
+```
+
+Output by site
+
+## _______________ Site 3 Honokohau _____________________
+
+Load and prepare data
+
+```{r}
+hono <- read.csv("honokohau_3.csv")
+```
+
+Convert all columns to factors
+
+```{r hono}
+hono$Site <- as.factor(as.character(hono$Site))
+hono$Transect.Number <- as.factor(hono$Transect.Number)
+hono$Date <- as.factor(hono$Date)
+hono$Time <- as.factor(hono$Time)
+hono$Meter <- as.factor(as.character(hono$Meter))
+hono$Point <- as.factor(as.character(hono$Point))
+hono$Substrate <- as.factor(hono$Substrate)
+hono$Living.cover <- as.factor(hono$Living.cover)
+hono$Genus <- as.factor(hono$Genus)
+hono$Species <- as.factor(hono$Species)
+```
+
+
+Make a column that puts Genus and species together
+```{r}
+hono$Genus_species <- as.factor(paste(hono$Genus, hono$Species, sep = "_"))
+```
+
+Make a column that puts site and transect number together
+```{r}
+hono$site_transect <- as.factor(paste(hono$Site, hono$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species) and calculates a percentage for each within the transect
+```{r}
+pt <- PivotTable$new()
+pt$addData(hono)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will provide totals for Ulva (all)
+```{r}
+pt <- PivotTable$new()
+pt$addData(hono)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate) and calculates a percentage for each within the transect
+```{r}
+pt <- PivotTable$new()
+pt$addData(hono)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover) and calculates a percentage for each within the transect
+```{r}
+pt <- PivotTable$new()
+pt$addData(hono)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+## _______________Site 4 QLC____________________
+
+Read in csv file(s) for QLC
+```{r}
+qlc <- read.csv("qlc_4.csv")
+```
+
+Convert all data columns to factors
+```{r}
+qlc$Site <- as.factor(as.character(qlc$Site))
+qlc$Transect.Number <- as.factor(qlc$Transect.Number)
+qlc$Date <- as.factor(qlc$Date)
+qlc$Time <- as.factor(qlc$Time)
+qlc$Meter <- as.factor(as.character(qlc$Meter))
+qlc$Point <- as.factor(as.character(qlc$Point))
+qlc$Substrate <- as.factor(qlc$Substrate)
+qlc$Living.cover <- as.factor(qlc$Living.cover)
+qlc$Genus <- as.factor(qlc$Genus)
+qlc$Species <- as.factor(qlc$Species)
+```
+Make a column that puts Genus and species together, another to put site and transect number together
+```{r}
+qlc$Genus_species <- as.factor(paste(qlc$Genus, qlc$Species, sep = "_"))
+qlc$site_transect <- as.factor(paste(qlc$Site, qlc$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(qlc)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This tallies all Ulva together
+```{r}
+pt <- PivotTable$new()
+pt$addData(qlc)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(qlc)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(qlc)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ____________Site 0 Mahaiula ________________
+
+Read in csv file(s) for additional Site 0 Mahaiula
+```{r}
+maha0 <- read.csv("mahaiula_0.csv")
+```
+
+Convert all data columns to factors
+```{r}
+maha0$Site <- as.factor(as.character(maha0$Site))
+maha0$Transect.Number <- as.factor(maha0$Transect.Number)
+maha0$Date <- as.factor(maha0$Date)
+maha0$Time <- as.factor(maha0$Time)
+maha0$Meter <- as.factor(as.character(maha0$Meter))
+maha0$Point <- as.factor(as.character(maha0$Point))
+maha0$Substrate <- as.factor(maha0$Substrate)
+maha0$Living.cover <- as.factor(maha0$Living.cover)
+maha0$Genus <- as.factor(maha0$Genus)
+maha0$Species <- as.factor(maha0$Species)
+```
+
+Make a column that puts Genus and species and site and transect number together
+```{r}
+maha0$Genus_species <- as.factor(paste(maha0$Genus, maha0$Species, sep = "_"))
+maha0$site_transect <- as.factor(paste(maha0$Site, maha0$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha0)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will tally all Ulva together
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha0)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha0)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha0)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ________________Site 1 Mahaiula__________________
+
+Read in csv file(s) for Site 1 Mahaiula
+```{r}
+maha1 <- read.csv("mahaiula_1.csv")
+```
+
+Convert all data columns to factors
+```{r}
+maha1$Site <- as.factor(as.character(maha1$Site))
+maha1$Transect.Number <- as.factor(maha1$Transect.Number)
+maha1$Date <- as.factor(maha1$Date)
+maha1$Time <- as.factor(maha1$Time)
+maha1$Meter <- as.factor(as.character(maha1$Meter))
+maha1$Point <- as.factor(as.character(maha1$Point))
+maha1$Substrate <- as.factor(maha1$Substrate)
+maha1$Living.cover <- as.factor(maha1$Living.cover)
+maha1$Genus <- as.factor(maha1$Genus)
+maha1$Species <- as.factor(maha1$Species)
+```
+
+Make a column that puts Genus and species and Site and Transect Number together
+```{r}
+maha1$Genus_species <- as.factor(paste(maha1$Genus, maha1$Species, sep = "_"))
+maha1$site_transect <- as.factor(paste(maha1$Site, maha1$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha1)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will tally all Ulva together
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha1)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha1)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(maha1)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ___________Site 5 Kona Town___________________
+
+Read in csv file(s) for Kona Town
+```{r}
+town <- read.csv("konatown_5.csv")
+```
+
+Convert all data columns to factors
+```{r}
+town$Site <- as.factor(as.character(town$Site))
+town$Transect.Number <- as.factor(town$Transect.Number)
+town$Date <- as.factor(town$Date)
+town$Time <- as.factor(town$Time)
+town$Meter <- as.factor(as.character(town$Meter))
+town$Point <- as.factor(as.character(town$Point))
+town$Substrate <- as.factor(town$Substrate)
+town$Living.cover <- as.factor(town$Living.cover)
+town$Genus <- as.factor(town$Genus)
+town$Species <- as.factor(town$Species)
+```
+
+Make a column that puts Genus and species and Site and Transect number together
+```{r}
+town$Genus_species <- as.factor(paste(town$Genus, town$Species, sep = "_"))
+town$site_transect <- as.factor(paste(town$Site, town$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(town)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will tally all Ulva together
+```{r}
+pt <- PivotTable$new()
+pt$addData(town)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(town)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(town)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ___________Site 2 NELHA___________
+
+Read in csv file(s) for NELHA
+```{r}
+nelha <- read.csv("nelha_2.csv")
+```
+
+Convert all data columns to factors
+```{r}
+nelha$Site <- as.factor(as.character(nelha$Site))
+nelha$Transect.Number <- as.factor(nelha$Transect.Number)
+nelha$Date <- as.factor(nelha$Date)
+nelha$Time <- as.factor(nelha$Time)
+nelha$Meter <- as.factor(as.character(nelha$Meter))
+nelha$Point <- as.factor(as.character(nelha$Point))
+nelha$Substrate <- as.factor(nelha$Substrate)
+nelha$Living.cover <- as.factor(nelha$Living.cover)
+nelha$Genus <- as.factor(nelha$Genus)
+nelha$Species <- as.factor(nelha$Species)
+```
+
+Make a column that puts Genus and species together
+```{r}
+nelha$Genus_species <- as.factor(paste(nelha$Genus, nelha$Species, sep = "_"))
+```
+
+Make a column that puts site and transect number together
+```{r}
+nelha$site_transect <- as.factor(paste(nelha$Site, nelha$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(nelha)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will tally all Ulva together
+```{r}
+pt <- PivotTable$new()
+pt$addData(nelha)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(nelha)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(nelha)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ___________Site 7 Lymans___________
+
+Read in csv file(s) for Lymans
+```{r}
+lymans <- read.csv("lymans_7.csv")
+```
+Convert all data columns to factors
+```{r}
+lymans$Site <- as.factor(as.character(lymans$Site))
+lymans$Transect.Number <- as.factor(lymans$Transect.Number)
+lymans$Date <- as.factor(lymans$Date)
+lymans$Time <- as.factor(lymans$Time)
+lymans$Meter <- as.factor(as.character(lymans$Meter))
+lymans$Point <- as.factor(as.character(lymans$Point))
+lymans$Substrate <- as.factor(lymans$Substrate)
+lymans$Living.cover <- as.factor(lymans$Living.cover)
+lymans$Genus <- as.factor(lymans$Genus)
+lymans$Species <- as.factor(lymans$Species)
+```
+
+Make a column that puts Genus and species and site and transect number together
+```{r}
+lymans$Genus_species <- as.factor(paste(lymans$Genus, lymans$Species, sep = "_"))
+lymans$site_transect <- as.factor(paste(lymans$Site, lymans$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(lymans)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will provide totals for Ulva (all)
+```{r}
+pt <- PivotTable$new()
+pt$addData(lymans)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(lymans)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(lymans)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+# ___________Site 8 Kahalu‘u___________
+
+Read in csv file(s) for Kahalu‘u
+```{r}
+kaha <- read.csv("kahaluu_8.csv")
+```
+
+Convert all data columns to factors
+```{r}
+kaha$Site <- as.factor(as.character(kaha$Site))
+kaha$Transect.Number <- as.factor(kaha$Transect.Number)
+kaha$Date <- as.factor(kaha$Date)
+kaha$Time <- as.factor(kaha$Time)
+kaha$Meter <- as.factor(as.character(kaha$Meter))
+kaha$Point <- as.factor(as.character(kaha$Point))
+kaha$Substrate <- as.factor(kaha$Substrate)
+kaha$Living.cover <- as.factor(kaha$Living.cover)
+kaha$Genus <- as.factor(kaha$Genus)
+kaha$Species <- as.factor(kaha$Species)
+```
+
+Make a column that puts Genus and species and site and transect number together
+```{r}
+kaha$Genus_species <- as.factor(paste(kaha$Genus, kaha$Species, sep = "_"))
+kaha$site_transect <- as.factor(paste(kaha$Site, kaha$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(kaha)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will provide totals for Ulva (all)
+```{r}
+pt <- PivotTable$new()
+pt$addData(kaha)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(kaha)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(kaha)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+# ___________Site 9 Keauhou___________
+
+Read in csv file(s) for Keauhou
+```{r}
+keau <- read.csv("keauhou_9.csv")
+```
+
+Convert all data columns to factors
+```{r}
+keau$Site <- as.factor(as.character(keau$Site))
+keau$Transect.Number <- as.factor(keau$Transect.Number)
+keau$Date <- as.factor(keau$Date)
+keau$Time <- as.factor(keau$Time)
+keau$Meter <- as.factor(as.character(keau$Meter))
+keau$Point <- as.factor(as.character(keau$Point))
+keau$Substrate <- as.factor(keau$Substrate)
+keau$Living.cover <- as.factor(keau$Living.cover)
+keau$Genus <- as.factor(keau$Genus)
+keau$Species <- as.factor(keau$Species)
+```
+
+Make a column that puts Genus and species and site and transect number together
+```{r}
+keau$Genus_species <- as.factor(paste(keau$Genus, keau$Species, sep = "_"))
+keau$site_transect <- as.factor(paste(keau$Site, keau$Transect.Number, sep = "_"))
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus_species)
+```{r}
+pt <- PivotTable$new()
+pt$addData(keau)
+pt$addColumnDataGroups("Genus_species")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Genus)
+This will provide totals for Ulva (all)
+```{r}
+pt <- PivotTable$new()
+pt$addData(keau)
+pt$addColumnDataGroups("Genus")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Substrate)
+```{r}
+pt <- PivotTable$new()
+pt$addData(keau)
+pt$addColumnDataGroups("Substrate")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
+
+Pivot data to provide total counts for each row (transect) and column (Live cover)
+```{r}
+pt <- PivotTable$new()
+pt$addData(keau)
+pt$addColumnDataGroups("Living.cover")
+pt$addRowDataGroups("site_transect")
+pt$defineCalculation(calculationName = "site_transectCount", summariseExpression = "n()",
+                     caption = "Count", visible = TRUE)
+filterOverrides <- PivotFilterOverrides$new(pt, keepOnlyFiltersFor="site_transect")
+pt$defineCalculation(calculationName="site_transectTotal", filters=filterOverrides, 
+                     summariseExpression="n()", caption="site_transect Total", visible=FALSE)
+pt$defineCalculation(calculationName="PercentageOfsite_transect", type="calculation", 
+                     basedOn=c("site_transectCount", "site_transectTotal"),
+                     calculationExpression="values$site_transectCount/values$site_transectTotal*100", 
+                     format="%.1f %%", caption="% Total")
+pt$renderPivot()
+```
